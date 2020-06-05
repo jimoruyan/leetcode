@@ -1,2 +1,2 @@
 # leetcode
-some javascripy algorithm
+some javascript algorithm
