@@ -119,7 +119,6 @@
             var lonlat = lonlat
             //定义划线起点red,yellow,green
             var latlngsR = [[lonlat.lat, lonlat.lon]], latlngsY = [[lonlat.lat, lonlat.lon]], latlngsG = [[lonlat.lat, lonlat.lon]]
-
             var speed = speed;  // 速度 m/s
             var time = time;   // 时间 hour
             var distence = speed * time * 3600;
@@ -138,12 +137,10 @@
                 var p_start = { x: parseFloat(point_start.split(",")[0]), y: parseFloat(point_start.split(",")[1]) };
                 var p_end = { x: parseFloat(point_end.split(",")[0]), y: parseFloat(point_end.split(",")[1]) };
                 //此处敲黑板，是任务的第二大难点，求出相对的第三个点，用于固定曲线的弯曲度，下面公式是已知三角形两点坐标和两个坐标点的夹角求第三点坐标，两个夹角我们是自定义任意值，不过不要加起来超过180度
-
                 let x3 = (p_start.x * w + p_end.x * w - p_start.y + p_end.y) / (2 * w)
                 let y3 = (p_start.y * w + p_end.y * w - p_end.x + p_start.x) / (2 * w)
                 var p_crt1 = { x: x3, y: y3 };
                 var p_crt2 = { x: x3, y: y3 };
-
                 let paths = [];
                 for (let i = 0; i < num + 1; i++) {
                     let t = i / num;
@@ -183,21 +180,18 @@
             var latlngsYE = calcCoorArr(latlngsY[0][1].toString() + ',' + latlngsY[0][0].toString(), latlngsY[1][1].toString() + ',' + latlngsY[1][0].toString(), 100, 3);
             var latlngsGB = calcCoorArr(latlngsG[0][1].toString() + ',' + latlngsG[0][0].toString(), latlngsG[1][1].toString() + ',' + latlngsG[1][0].toString(), 100, -3);
             var latlngsGE = calcCoorArr(latlngsG[0][1].toString() + ',' + latlngsG[0][0].toString(), latlngsG[1][1].toString() + ',' + latlngsG[1][0].toString(), 100, 3);
-            //红色弧线
-            L.polyline(latlngsRB, { color: 'red' }).addTo(map);
-            L.polyline(latlngsRE, { color: 'red' }).addTo(map);
-            //黄色弧线
-            L.polyline(latlngsYB, { color: 'yellow' }).addTo(map);
-            L.polyline(latlngsYE, { color: 'yellow' }).addTo(map);
             //绿色弧线
-            L.polyline(latlngsGB, { color: 'green' }).addTo(map);
-            L.polyline(latlngsGE, { color: 'green' }).addTo(map);
+            L.polyline(latlngsGB, { color: 'green', fill: true, fillColor: 'green' }).addTo(map);
+            L.polyline(latlngsGE, { color: 'green', fill: true, fillColor: 'green' }).addTo(map);
+            //黄色弧线
+            L.polyline(latlngsYB, { color: 'yellow', fill: true, fillColor: 'yellow' }).addTo(map);
+            L.polyline(latlngsYE, { color: 'yellow', fill: true, fillColor: 'yellow' }).addTo(map);
+            //红色弧线
+            L.polyline(latlngsRB, { color: 'red', fill: true, fillColor: 'red' }).addTo(map);
+            L.polyline(latlngsRE, { color: 'red', fill: true, fillColor: 'red' }).addTo(map);
+
+
         }
-
-
-
-
-
     </script>
 </body>
 
