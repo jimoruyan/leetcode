@@ -28,7 +28,7 @@
 <body>
     <div id="mapid"></div>
     <script>
-        drawEllipse({ lon: 114.44556, lat: 37.043797 }, 4, 2, 90)
+        drawEllipse({ lon: 114.44556, lat: 37.043797 }, 4,1, 90)
 
         function drawEllipse(lonlat, speed, time, direction) {
             var map = L.map('mapid').setView([37.043797, 114.44556], 12);
@@ -128,9 +128,9 @@
             latlngsY.push(destinationVincenty(lonlat, direction, distence * 3 / 4))
             latlngsG.push(destinationVincenty(lonlat, direction, distence))
 
-            L.polyline(latlngsG, { color: 'green' }).addTo(map);
-            L.polyline(latlngsY, { color: 'yellow' }).addTo(map);
-            L.polyline(latlngsR, { color: 'red' }).addTo(map);
+            // L.polyline(latlngsG, { color: 'green' }).addTo(map);
+            // L.polyline(latlngsY, { color: 'yellow' }).addTo(map);
+            // L.polyline(latlngsR, { color: 'red' }).addTo(map);
 
             var calcCoorArr = (point_start, point_end, num, w) => {// 入参两个坐标（字符串格式："114.30911,30.600052"）,num是返回坐标点个数,w为弯曲曲度
                 //第一步把坐标字符串转为对象,为了方便计算转为了数字格式
@@ -174,21 +174,24 @@
                 return paths;
             }
             //使用calcCoorArr方法计算出路径点
-            var latlngsRB = calcCoorArr(latlngsR[0][1].toString() + ',' + latlngsR[0][0].toString(), latlngsR[1][1].toString() + ',' + latlngsR[1][0].toString(), 100, -3);
-            var latlngsRE = calcCoorArr(latlngsR[0][1].toString() + ',' + latlngsR[0][0].toString(), latlngsR[1][1].toString() + ',' + latlngsR[1][0].toString(), 100, 3);
-            var latlngsYB = calcCoorArr(latlngsY[0][1].toString() + ',' + latlngsY[0][0].toString(), latlngsY[1][1].toString() + ',' + latlngsY[1][0].toString(), 100, -3);
-            var latlngsYE = calcCoorArr(latlngsY[0][1].toString() + ',' + latlngsY[0][0].toString(), latlngsY[1][1].toString() + ',' + latlngsY[1][0].toString(), 100, 3);
-            var latlngsGB = calcCoorArr(latlngsG[0][1].toString() + ',' + latlngsG[0][0].toString(), latlngsG[1][1].toString() + ',' + latlngsG[1][0].toString(), 100, -3);
-            var latlngsGE = calcCoorArr(latlngsG[0][1].toString() + ',' + latlngsG[0][0].toString(), latlngsG[1][1].toString() + ',' + latlngsG[1][0].toString(), 100, 3);
+            var latlngsRB = calcCoorArr(latlngsR[0][1].toString() + ',' + latlngsR[0][0].toString(), latlngsR[1][1].toString() + ',' + latlngsR[1][0].toString(), 100, -2);
+            var latlngsRE = calcCoorArr(latlngsR[0][1].toString() + ',' + latlngsR[0][0].toString(), latlngsR[1][1].toString() + ',' + latlngsR[1][0].toString(), 100, 2);
+            var latlngsYB = calcCoorArr(latlngsY[0][1].toString() + ',' + latlngsY[0][0].toString(), latlngsY[1][1].toString() + ',' + latlngsY[1][0].toString(), 100, -2);
+            var latlngsYE = calcCoorArr(latlngsY[0][1].toString() + ',' + latlngsY[0][0].toString(), latlngsY[1][1].toString() + ',' + latlngsY[1][0].toString(), 100, 2);
+            var latlngsGB = calcCoorArr(latlngsG[0][1].toString() + ',' + latlngsG[0][0].toString(), latlngsG[1][1].toString() + ',' + latlngsG[1][0].toString(), 100, -2);
+            var latlngsGE = calcCoorArr(latlngsG[0][1].toString() + ',' + latlngsG[0][0].toString(), latlngsG[1][1].toString() + ',' + latlngsG[1][0].toString(), 100, 2);
             //绿色弧线
-            L.polyline(latlngsGB, { color: 'green', fill: true, fillColor: 'green' }).addTo(map);
-            L.polyline(latlngsGE, { color: 'green', fill: true, fillColor: 'green' }).addTo(map);
+            
+            L.polygon(Array.from(new Set([...latlngsGB,...latlngsGE].map(item => item.join('-')))).map(item => item.split('-')), { color: 'green', fill: true, fillColor: 'green' }).addTo(map);
+
+            // L.polygon([...latlngsGB,...latlngsGE], { color: 'green', fill: true, fillColor: 'green' }).addTo(map);
+            // L.polygon(latlngsGE, { color: 'green', fill: true, fillColor: 'green' }).addTo(map);
             //黄色弧线
-            L.polyline(latlngsYB, { color: 'yellow', fill: true, fillColor: 'yellow' }).addTo(map);
-            L.polyline(latlngsYE, { color: 'yellow', fill: true, fillColor: 'yellow' }).addTo(map);
+            L.polygon([...latlngsYB,...latlngsYE], { color: 'yellow', fill: true, fillColor: 'yellow' }).addTo(map);
+            // L.polygon(latlngsYE, { color: 'yellow', fill: true, fillColor: 'yellow' }).addTo(map);
             //红色弧线
-            L.polyline(latlngsRB, { color: 'red', fill: true, fillColor: 'red' }).addTo(map);
-            L.polyline(latlngsRE, { color: 'red', fill: true, fillColor: 'red' }).addTo(map);
+            L.polygon([...latlngsRB,...latlngsRE], { color: 'red', fill: true, fillColor: 'red' }).addTo(map);
+            // L.polygon(latlngsRE, { color: 'red', fill: true, fillColor: 'red' }).addTo(map);
 
 
         }
