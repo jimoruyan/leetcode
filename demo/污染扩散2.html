@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Leaflet Quick Start Guide Example</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+</head>
+<style>
+    html,
+    body {
+        height: 100%;
+    }
+
+    #mapid {
+        height: 100%;
+        overflow: hidden;
+
+    }
+</style>
+
+<body>
+    <div id="mapid"></div>
+    <script>
+
+        var map = L.map('mapid').setView([37.043797, 114.44556], 12);
+        L.tileLayer('http://wprd0{s}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=7', {
+            attribution: '&copy; 高德地图',
+            maxZoom: 24,
+            minZoom: 4,
+            subdomains: "1234"
+        }).addTo(map);
+        drawEllipse({ lon: 114.44556, lat: 37.043797 }, 4, 1, 270, 3)
+        /**
+           * 给定起点位置经纬度方向时间画椭圆
+           * @lonlat  {Object}  经纬度  {lon:0,lat:0}
+           * @speed  {number} 风速 m/s
+           * @time  {number} 时间 h
+           * @direction {number} 风向 度数 0—360 0：北风  180：南风
+           * @width {number} 椭圆最小半径 
+           */
+        function drawEllipse(lonlat, speed, time, direction, width) {
+
+            var _qd = lonlat//定义起点
+            var speed = speed;  // 速度 m/s
+            var time = time;   // 时间 hour
+            var distence = speed * time * 3600 / 2; //起点到终点的距离，椭圆半径
+            var direction = direction + 180 //角度
+
+
+            var red = destinationVincenty(_qd, direction, distence * 1 / 2)     //红色椭圆圆心
+            var yellow = destinationVincenty(_qd, direction, distence * 3 / 4)  //黄色椭圆圆心
+            var green = destinationVincenty(_qd, direction, distence)   //绿色椭圆圆心
+            var _red = [];  //红色椭圆点数组
+            var _yellow = []   //黄色椭圆点数组
+            var _green = [] //绿色椭圆点数组
+            var radius = width
+            /**
+            *Calculate destination point given start point lat/long (numeric degrees),
+            * bearing (numeric degrees) & distance (in m).
+            * 给定位置经纬度方向距离计算目的地点经纬度
+            * @lonlat  {Object}  经纬度  {lon:0,lat:0}
+            * @brng  {number} 度数 0—360 0：北方  180：南方
+            * @dist  {number} 距离(m)
+            * @return {Array}   经纬度
+            */
+            function destinationVincenty(lonlat, brng, dist) {
+                const a = 6378137;
+                const b = 6356752.3142;
+                const f = 1 / 298.257223563;
+                var lon1 = lonlat.lon * 1;  //乘一（*1）是为了确保经纬度的数据类型为number
+                var lat1 = lonlat.lat * 1;
+                var s = dist;
+                var alpha1 = rad(brng);
+                var sinAlpha1 = Math.sin(alpha1);
+                var cosAlpha1 = Math.cos(alpha1);
+                var tanU1 = (1 - f) * Math.tan(rad(lat1));
+                var cosU1 = 1 / Math.sqrt((1 + tanU1 * tanU1)), sinU1 = tanU1 * cosU1;
+                var sigma1 = Math.atan2(tanU1, cosAlpha1);
+                var sinAlpha = cosU1 * sinAlpha1;
+                var cosSqAlpha = 1 - sinAlpha * sinAlpha;
+                var uSq = cosSqAlpha * (a * a - b * b) / (b * b);
+                var A = 1 + uSq / 16384 * (4096 + uSq * (-768 + uSq * (320 - 175 * uSq)));
+                var B = uSq / 1024 * (256 + uSq * (-128 + uSq * (74 - 47 * uSq)));
+
+                var sigma = s / (b * A), sigmaP = 2 * Math.PI;
+                while (Math.abs(sigma - sigmaP) > 1e-12) {
+                    var cos2SigmaM = Math.cos(2 * sigma1 + sigma);
+                    var sinSigma = Math.sin(sigma);
+                    var cosSigma = Math.cos(sigma);
+                    var deltaSigma = B * sinSigma * (cos2SigmaM + B / 4 * (cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM) -
+                        B / 6 * cos2SigmaM * (-3 + 4 * sinSigma * sinSigma) * (-3 + 4 * cos2SigmaM * cos2SigmaM)));
+                    sigmaP = sigma;
+                    sigma = s / (b * A) + deltaSigma;
+                }
+
+                var tmp = sinU1 * sinSigma - cosU1 * cosSigma * cosAlpha1;
+                var lat2 = Math.atan2(sinU1 * cosSigma + cosU1 * sinSigma * cosAlpha1,
+                    (1 - f) * Math.sqrt(sinAlpha * sinAlpha + tmp * tmp));
+                var lambda = Math.atan2(sinSigma * sinAlpha1, cosU1 * cosSigma - sinU1 * sinSigma * cosAlpha1);
+                var C = f / 16 * cosSqAlpha * (4 + f * (4 - 3 * cosSqAlpha));
+                var L = lambda - (1 - C) * f * sinAlpha * (sigma + C * sinSigma * (cos2SigmaM + C * cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM)));
+
+                var revAz = Math.atan2(sinAlpha, -tmp);  // final bearing
+                var lon_destina = lon1 * 1 + deg(L);
+                var lonlat_destination = [deg(lat2), lon_destina];
+
+                return lonlat_destination;
+            }
+
+            /**
+            * 度换成弧度
+            * @param  {Float} d  度
+            * @return {[Float}   弧度
+            */
+            function rad(d) {
+                return d * Math.PI / 180.0;
+            }
+
+            /**
+             * 弧度换成度
+             * @param  {Float} x 弧度
+             * @return {Float}   度
+             */
+            function deg(x) {
+                return x * 180 / Math.PI;
+            }
+
+            /**
+            * 利用点数组画椭圆
+            * @distence  {number}  起点到圆心的距离  
+            * @lonlat  {object} 椭圆中心点的位置
+            * @arr  {Array} 椭圆点集合
+            * @color {string}   颜色
+            * @r {number}   最小半径
+            * @direction {number}   方向
+            */
+            function _draw(distence, lonlat, arr, color, r, direction) {
+                for (let i = direction; i < 360 + direction; i++) {
+                    if (i >= 20 + direction && i < 90 + direction || i >= 200 + direction && i < 270 + direction) {
+                        let _b = (distence / r) + (distence - distence / r) / 90 / 90 / 90 * ((i - direction) % 90) * ((i - direction) % 90) * ((i - direction) % 90)
+                        arr.push(destinationVincenty(lonlat, i, _b))
+                    }
+                    else if (i >= 90 + direction && i <= 160 + direction || i >= 250 + direction && i < 340 + direction) {
+                        let b = (distence / r) + (distence - distence / r) / 90 / 90 / 90 * (90 - (i - direction) % 90) * (90 - (i - direction) % 90) * (90 - (i - direction) % 90)
+                        arr.push(destinationVincenty(lonlat, i, b))
+                    }
+                }
+                L.polygon(arr, { color: color, fill: true, fillColor: color }).addTo(map);
+            }
+            //画椭圆
+            _draw(distence / 2, { lon: red[1], lat: red[0] }, _red, 'red', radius, direction - 90)
+            _draw(distence * 3 / 4, { lon: yellow[1], lat: yellow[0] }, _yellow, 'yellow', radius, direction - 90)
+            _draw(distence, { lon: green[1], lat: green[0] }, _green, 'green', radius, direction - 90)
+            console.log(_red)
+
+        }
+
+    </script>
+</body>
+
+</html>
